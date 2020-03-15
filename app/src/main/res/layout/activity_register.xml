@@ -52,6 +52,7 @@
         <EditText
             android:inputType="phone"
             android:singleLine="true"
+            android:hint="@string/_093693498"
             android:id="@+id/userPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -66,7 +67,9 @@
             android:id="@+id/userPassword"
             android:singleLine="true"
             android:inputType="textPassword"
+            android:hint="••••••••"
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"/>
 
         <TextView
@@ -78,6 +81,7 @@
             android:id="@+id/userConfirmPassword"
             android:singleLine="true"
             android:inputType="textPassword"
+            android:hint="••••••••"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
