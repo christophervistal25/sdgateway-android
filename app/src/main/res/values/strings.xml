@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SDGateway</string>
+    <string name="base_url">https://sdgateway.herokuapp.com/</string>
+    <string name="phone_number">Phone number</string>
+    <string name="_093693498">093693498</string>
+    <string name="login">SIGN IN</string>
+    <string name="password">Password</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="confirm_password">Confirm Password</string>
+</resources>
