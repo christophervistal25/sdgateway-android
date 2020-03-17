@@ -91,8 +91,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<UserLoginResponse> call, Throwable t) {
-                    Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
+                    if (t.getMessage().contains("Unable to resolve host")) {
+                        Toast.makeText(LoginActivity.this, "Please check your internet connection.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         });

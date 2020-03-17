@@ -58,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
             userRegisterRequest.setPrimary_phone_number(primaryPhoneNumber.getText().toString());
-            userRegisterRequest.setPrimary_phone_number(password.getText().toString());
+            userRegisterRequest.setPassword(password.getText().toString());
 
             Call<UserRegisterResponse> userRegisterResponseCall = services.register(userRegisterRequest);
             userRegisterResponseCall.enqueue(new Callback<UserRegisterResponse>() {
@@ -73,16 +73,17 @@ public class RegisterActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
-                        Toast.makeText(RegisterActivity.this, "Phone number is already register.", Toast.LENGTH_SHORT).show();
-                        progressDialog.dismiss();
-                        primaryPhoneNumber.setError("Phone number is already exists");
+                        Toast.makeText(RegisterActivity.this, response.body().getPrimaryPhoneNumber(), Toast.LENGTH_SHORT).show();
                     }
+                    progressDialog.dismiss();
                 }
 
                 @Override
                 public void onFailure(Call<UserRegisterResponse> call, Throwable t) {
                     progressDialog.dismiss();
-                    Toast.makeText(RegisterActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (t.getMessage().contains("Unable to resolve host")) {
+                        Toast.makeText(RegisterActivity.this, "Please check your internet connection.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
