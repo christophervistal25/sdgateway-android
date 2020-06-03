@@ -8,6 +8,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,6 +32,7 @@ import com.sdgateway.Helper.SharedPref;
 import com.sdgateway.Modules.Models.Message.FetchMessageResponse;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -144,9 +150,10 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<FetchMessageResponse>> call, Response<List<FetchMessageResponse>> response) {
                 if(checkPermission(Manifest.permission.SEND_SMS))
                 {
-                    SmsManager smsManager = SmsManager.getDefault();
                     for(FetchMessageResponse r : response.body()) {
-                        smsManager.sendTextMessage(r.getPhoneNumber(),null, r.getMessage(),null,null);
+                        MainActivity.this.sendSMS(r.getPhoneNumber(), r.getMessage());
+                        MainActivity.this.messages.addAll(response.body());
+                        MainActivity.this.sendListAdapter.notifyDataSetChanged();
                         messages.addAll(response.body());
                         sendListAdapter.notifyDataSetChanged();
 
@@ -170,6 +177,40 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         //Remove all the callbacks otherwise navigation will execute even after activity is killed or closed.
         mWaitHandler.removeCallbacksAndMessages(null);
+    }
+
+
+    /* access modifiers changed from: private */
+    public void sendSMS(String phoneNumber, String message) {
+        String SENT = "SMS_SENT";
+        String DELIVERED = "SMS_DELIVERED";
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+        String str = "deprecation";
+        registerReceiver(new BroadcastReceiver() {
+            public void onReceive(Context arg0, Intent arg1) {
+                int resultCode = getResultCode();
+                if (resultCode == -1) {
+                    Toast.makeText(MainActivity.this, "SMS sent", Toast.LENGTH_LONG).show();
+                } else if (resultCode != 1) {
+                    if (resultCode == 3 || resultCode != 4) {
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "SMS failed to send", Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new IntentFilter(SENT));
+        registerReceiver(new BroadcastReceiver() {
+            public void onReceive(Context arg0, Intent arg1) {
+                int resultCode = getResultCode();
+                if (resultCode == -1) {
+                    Toast.makeText(MainActivity.this, "SMS delivered", Toast.LENGTH_LONG).show();
+                } else if (resultCode == 0) {
+                    Toast.makeText(MainActivity.this, "SMS not delivered", Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new IntentFilter(DELIVERED));
+        SmsManager.getDefault().sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
     }
 
     private boolean checkPermission(String sendSms) {
